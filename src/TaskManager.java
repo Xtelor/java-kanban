@@ -31,11 +31,6 @@ public class TaskManager {
         taskMap.put(task.getTaskId(), task);
     }
 
-    // Получение идентификатора для следующей задачи
-    private int getNextId() {
-        return generatorId++;
-    }
-
     // Получение списка задач
     public ArrayList<Task> getTasks() {
         return new ArrayList<>(taskMap.values());
@@ -119,37 +114,6 @@ public class TaskManager {
         return epic.getSubtasks();
     }
 
-    // Обновление статуса эпика
-    private void updateEpicStatus(Epic epic) {
-        boolean isAllNew = true;
-        boolean isAllDone = true;
-
-        for (Subtask subtask : epic.getSubtasks()) {
-            TaskStatus status = subtask.getTaskStatus();
-
-            if (status != TaskStatus.NEW) {
-                isAllNew = false;
-            }
-
-            if (status != TaskStatus.DONE) {
-                isAllDone = false;
-            }
-
-            if (status == TaskStatus.IN_PROGRESS) {
-                epic.setTaskStatus(TaskStatus.IN_PROGRESS);
-                return;
-            }
-        }
-
-        if (isAllDone) {
-            epic.setTaskStatus(TaskStatus.DONE);
-        } else if (isAllNew) {
-            epic.setTaskStatus(TaskStatus.NEW);
-        } else {
-            epic.setTaskStatus(TaskStatus.IN_PROGRESS);
-        }
-    }
-
     /*
      *  Подзадачи
      */
@@ -223,14 +187,39 @@ public class TaskManager {
         return null;
     }
 
-    // Получение АБСОЛЮТНО ВСЕХ задач
-    public List<Task> getAllTasks() {
-        List<Task> allTasks = new ArrayList<>();
+    // Получение идентификатора для следующей задачи
+    private int getNextId() {
+        return generatorId++;
+    }
 
-        allTasks.addAll(taskMap.values());
-        allTasks.addAll(epicMap.values());
-        allTasks.addAll(subtaskMap.values());
+    // Обновление статуса эпика
+    private void updateEpicStatus(Epic epic) {
+        boolean isAllNew = true;
+        boolean isAllDone = true;
 
-        return allTasks;
+        for (Subtask subtask : epic.getSubtasks()) {
+            TaskStatus status = subtask.getTaskStatus();
+
+            if (status != TaskStatus.NEW) {
+                isAllNew = false;
+            }
+
+            if (status != TaskStatus.DONE) {
+                isAllDone = false;
+            }
+
+            if (status == TaskStatus.IN_PROGRESS) {
+                epic.setTaskStatus(TaskStatus.IN_PROGRESS);
+                return;
+            }
+        }
+
+        if (isAllDone) {
+            epic.setTaskStatus(TaskStatus.DONE);
+        } else if (isAllNew) {
+            epic.setTaskStatus(TaskStatus.NEW);
+        } else {
+            epic.setTaskStatus(TaskStatus.IN_PROGRESS);
+        }
     }
 }

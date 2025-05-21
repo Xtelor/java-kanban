@@ -34,7 +34,6 @@ public class Main {
         System.out.println("Все подзадачи" + taskManager.getSubtasks() + "\n");
         System.out.println("Все подзадачи первого эпика: " + taskManager.getEpicSubtasks(epic));
         System.out.println("Все подзадачи первого эпика: " + taskManager.getEpicSubtasks(anotherEpic));
-        System.out.println("Список абсолютно всех задач: " + taskManager.getAllTasks() + "\n");
 
         //Получение по идентификатору
         System.out.println("Получение задачи по идентификатору: " + taskManager.getTaskById(task.getTaskId()));
@@ -73,6 +72,8 @@ public class Main {
         taskManager.deleteAllSubtasks();
         taskManager.deleteAllEpics();
         taskManager.deleteAllTasks();
-        System.out.println("Оставшиеся задачи после удаления: " + taskManager.getAllTasks());
+        System.out.println("Оставшиеся задачи после удаления: " + taskManager.getTasks());
+        System.out.println("Оставшиеся эпики после удаления: " + taskManager.getEpics());
+        System.out.println("Оставшиеся задачи после удаления: " + taskManager.getSubtasks());
     }
 }
