@@ -1,12 +1,21 @@
+package tasks;
+
 import java.util.Objects;
 
 public class Task {
-    private long taskIdentifier;
+    private int taskIdentifier;
     private String taskName;
     private String taskDescription;
     private TaskStatus taskStatus;
 
     public Task(String taskName, String taskDescription, TaskStatus taskStatus) {
+        this.taskName = taskName;
+        this.taskDescription = taskDescription;
+        this.taskStatus = taskStatus;
+    }
+
+    public Task(int taskIdentifier, String taskName, String taskDescription, TaskStatus taskStatus) {
+        this.taskIdentifier = taskIdentifier;
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
@@ -25,35 +34,43 @@ public class Task {
         return Objects.hashCode(taskIdentifier);
     }
 
-    public long getTaskIdentifier() {
+    // Получение идентификатора задачи
+    public int getTaskId() {
         return taskIdentifier;
     }
 
-    public void setTaskIdentifier(long taskIdentifier) {
+    // Установка идентификатора задачи
+    public void setTaskId(int taskIdentifier) {
         this.taskIdentifier = taskIdentifier;
     }
 
+    // Получение имени задачи
     public String getTaskName() {
         return taskName;
     }
 
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
-    }
-
+    // Получение описания задачи
     public String getTaskDescription() {
         return taskDescription;
     }
 
-    public void setTaskDescription(String taskDescription) {
-        this.taskDescription = taskDescription;
-    }
-
+    // Получение статуса задачи
     public TaskStatus getTaskStatus() {
         return taskStatus;
     }
 
+    // Установка статуса задачи
     public void setTaskStatus(TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "taskIdentifier = " + taskIdentifier +
+                ", taskName = '" + taskName + '\'' +
+                ", taskDescription = '" + taskDescription + '\'' +
+                ", taskStatus = " + taskStatus +
+                '}';
     }
 }
