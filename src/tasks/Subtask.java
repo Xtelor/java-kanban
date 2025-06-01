@@ -11,6 +11,8 @@ public class Subtask extends Task {
         super(taskIdentifier, taskName, taskDescription, taskStatus);
     }
 
+
+
     // Получение идентификатора эпика для подзадачи
     public int getEpicIdentifier() {
         return epicIdentifier;
@@ -18,6 +20,9 @@ public class Subtask extends Task {
 
     // Установка идентификатора эпика для подзадачи
     public void setEpicIdentifier(int epicIdentifier) {
+        if (epicIdentifier == this.getTaskId()) {
+            return;
+        }
         this.epicIdentifier = epicIdentifier;
     }
 

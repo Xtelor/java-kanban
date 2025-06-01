@@ -1,3 +1,5 @@
+import manager.Managers;
+import manager.TaskManager;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
@@ -6,7 +8,7 @@ import tasks.TaskStatus;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = Managers.getDefault();
 
         //Создание задач
         Task task = new Task("Магазин", "Купить продукты", TaskStatus.NEW);
@@ -75,5 +77,8 @@ public class Main {
         System.out.println("Оставшиеся задачи после удаления: " + taskManager.getTasks());
         System.out.println("Оставшиеся эпики после удаления: " + taskManager.getEpics());
         System.out.println("Оставшиеся задачи после удаления: " + taskManager.getSubtasks());
+
+        System.out.println("\nИстория: ");
+        System.out.println(taskManager.getHistory());
     }
 }

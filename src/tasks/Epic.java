@@ -26,9 +26,11 @@ public class Epic extends Task {
 
     // Добавление подзадачи в список подзадач эпика
     public void addSubtask(Subtask subtask){
-        if (subtask != null && subtask.getEpicIdentifier() == this.getTaskId()) {
-            subtasks.add(subtask);
+        if (subtask == null || subtask.getEpicIdentifier() != this.getTaskId()) {
+            return;
         }
+
+        subtasks.add(subtask);
     }
 
     // Получение списка идентификаторов подзадач для эпика

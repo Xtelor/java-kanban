@@ -1,23 +1,24 @@
+package manager;
+
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 import tasks.TaskStatus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class TaskManager {
+public class InMemoryTaskManager implements TaskManager {
     private Map<Integer, Task> taskMap;
     private Map<Integer, Epic> epicMap;
     private Map<Integer, Subtask> subtaskMap;
     private int generatorId; // Поле для генерации идентификатора
+    private HistoryManager historyManager; // История просмотров задач
 
-    public TaskManager () {
+    public InMemoryTaskManager() {
         this.taskMap = new HashMap<>();
         this.epicMap = new HashMap<>();
         this.subtaskMap = new HashMap<>();
+        this.historyManager = Managers.getDefaultHistory();
         this.generatorId = 1;
     }
 
@@ -26,22 +27,26 @@ public class TaskManager {
      */
 
     // Создание новой задачи
+    @Override
     public void createNewTask(Task task) {
         task.setTaskId(getNextId());
         taskMap.put(task.getTaskId(), task);
     }
 
     // Получение списка задач
+    @Override
     public ArrayList<Task> getTasks() {
         return new ArrayList<>(taskMap.values());
     }
 
     // Удаление всех задач
+    @Override
     public void deleteAllTasks() {
         taskMap.clear();
     }
 
     // Обновление задачи
+    @Override
     public Task updateTask(Task task) {
         if (taskMap.containsKey(task.getTaskId())) {
             taskMap.put(task.getTaskId(), task);
@@ -51,11 +56,15 @@ public class TaskManager {
     }
 
     // Получение задачи по идентификатору
+    @Override
     public Task getTaskById(int identifier) {
-        return taskMap.get(identifier);
+        Task task = taskMap.get(identifier);
+        addInHistory(task);
+        return task;
     }
 
     //Удаление задачи по идентификатору
+    @Override
     public Task deleteTaskById(int identifier) {
         return taskMap.remove(identifier);
     }
@@ -65,23 +74,27 @@ public class TaskManager {
      */
 
     //Создание нового эпика
+    @Override
     public void createNewEpic(Epic epic) {
         epic.setTaskId(getNextId());
         epicMap.put(epic.getTaskId(), epic);
     }
 
     // Получение списка эпиков
+    @Override
     public ArrayList<Epic> getEpics() {
         return new ArrayList<>(epicMap.values());
     }
 
     // Удаление всех эпиков, включая их подзадачи
+    @Override
     public void deleteAllEpics() {
         epicMap.clear();
         subtaskMap.clear();
     }
 
     // Обновление эпика
+    @Override
     public Epic updateEpic(Epic epic) {
         if (epicMap.containsKey(epic.getTaskId())) {
             Epic currentEpic = epicMap.get(epic.getTaskId());
@@ -94,11 +107,15 @@ public class TaskManager {
     }
 
     // Получение эпика по идентификатору
+    @Override
     public Epic getEpicById(int identifier) {
-        return epicMap.get(identifier);
+        Epic epic = epicMap.get(identifier);
+        addInHistory(epic);
+        return epic;
     }
 
     // Удаление эпика по идентификатору
+    @Override
     public Epic deleteEpicById(int identifier) {
        Epic epic = epicMap.remove(identifier);
        if (epic != null) {
@@ -110,6 +127,7 @@ public class TaskManager {
     }
 
     // Получение списка подзадач эпика
+    @Override
     public ArrayList<Subtask> getEpicSubtasks(Epic epic) {
         return epic.getSubtasks();
     }
@@ -119,7 +137,11 @@ public class TaskManager {
      */
 
     // Создание новой подзадачи
+    @Override
     public void createNewSubtask(Epic epic, Subtask subtask){
+        if (epic.getTaskId() == subtask.getTaskId()) {
+            return;
+        }
         subtask.setTaskId(getNextId());
         subtask.setEpicIdentifier(epic.getTaskId());
         subtaskMap.put(subtask.getTaskId(), subtask);
@@ -128,16 +150,21 @@ public class TaskManager {
     }
 
     // Получения списка всех подзадач
+    @Override
     public ArrayList<Subtask> getSubtasks() {
         return new ArrayList<>(subtaskMap.values());
     }
 
     // Получение подзадачи по идентификатору
+    @Override
     public Subtask getSubtaskById(int identifier) {
-        return subtaskMap.get(identifier);
+        Subtask subtask = subtaskMap.get(identifier);
+        addInHistory(subtask);
+        return subtask;
     }
 
     // Удаление всех подзадач
+    @Override
     public void deleteAllSubtasks() {
         subtaskMap.clear();
 
@@ -148,6 +175,7 @@ public class TaskManager {
     }
 
     // Удаление подзадачи по идентификатору
+    @Override
     public Subtask deleteSubtaskById(int identifier) {
         Subtask subtask = subtaskMap.remove(identifier);
 
@@ -163,7 +191,12 @@ public class TaskManager {
     }
 
     // Обновление подзадачи
+    @Override
     public Subtask updateSubtask(Subtask subtask) {
+        if (subtask.getEpicIdentifier() == subtask.getTaskId()) {
+            return null;
+        }
+
         if (subtaskMap.containsKey(subtask.getTaskId())) {
             Subtask currentSubtask = subtaskMap.get(subtask.getTaskId());
             subtask.setEpicIdentifier(currentSubtask.getEpicIdentifier()); // Сохранение связи подзадачи с эпиком
@@ -185,6 +218,17 @@ public class TaskManager {
             return subtask;
         }
         return null;
+    }
+
+    // Возвращает историю
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
+    }
+
+    // Добавление задачи в историю
+    private <T extends Task> void addInHistory(T task) {
+        historyManager.addInHistory(task);
     }
 
     // Получение идентификатора для следующей задачи
