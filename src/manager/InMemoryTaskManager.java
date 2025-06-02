@@ -8,11 +8,11 @@ import tasks.TaskStatus;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private Map<Integer, Task> taskMap;
-    private Map<Integer, Epic> epicMap;
-    private Map<Integer, Subtask> subtaskMap;
+    private final Map<Integer, Task> taskMap;
+    private final Map<Integer, Epic> epicMap;
+    private final Map<Integer, Subtask> subtaskMap;
     private int generatorId; // Поле для генерации идентификатора
-    private HistoryManager historyManager; // История просмотров задач
+    private final HistoryManager historyManager; // История просмотров задач
 
     public InMemoryTaskManager() {
         this.taskMap = new HashMap<>();
@@ -35,7 +35,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Получение списка задач
     @Override
-    public ArrayList<Task> getTasks() {
+    public List<Task> getTasks() {
         return new ArrayList<>(taskMap.values());
     }
 
@@ -82,7 +82,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Получение списка эпиков
     @Override
-    public ArrayList<Epic> getEpics() {
+    public List<Epic> getEpics() {
         return new ArrayList<>(epicMap.values());
     }
 
@@ -128,7 +128,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Получение списка подзадач эпика
     @Override
-    public ArrayList<Subtask> getEpicSubtasks(Epic epic) {
+    public List<Subtask> getEpicSubtasks(Epic epic) {
         return epic.getSubtasks();
     }
 
@@ -151,7 +151,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Получения списка всех подзадач
     @Override
-    public ArrayList<Subtask> getSubtasks() {
+    public List<Subtask> getSubtasks() {
         return new ArrayList<>(subtaskMap.values());
     }
 
@@ -227,7 +227,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     // Добавление задачи в историю
-    private <T extends Task> void addInHistory(T task) {
+    private void addInHistory(Task task) {
         historyManager.addInHistory(task);
     }
 

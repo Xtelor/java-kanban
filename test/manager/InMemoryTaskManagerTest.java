@@ -11,14 +11,14 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class InMemoryTaskManagerTest {
+class InMemoryTaskManagerTest {
     private TaskManager taskManager;
     private Task task;
     private Epic epic;
     private Subtask subtask;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         taskManager = Managers.getDefault();
 
         task = new Task("Задача #1","Проверка", TaskStatus.NEW);
@@ -27,26 +27,26 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка создания задачи
-    public void shouldCreateTask() {
+    void shouldCreateTask() {
         taskManager.createNewTask(task);
         assertTrue(taskManager.getTasks().contains(task), "Задача не добавлена");
     }
 
     @Test // Проверка создания эпика
-    public void shouldCreateEpic() {
+    void shouldCreateEpic() {
         taskManager.createNewEpic(epic);
         assertTrue(taskManager.getEpics().contains(epic),"Эпик не добавлен");
     }
 
     @Test // Проверка создания подзадачи
-    public void shouldCreateSubtask() {
+    void shouldCreateSubtask() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic,subtask);
         assertTrue(taskManager.getSubtasks().contains(subtask), "Подзадача не добавлена");
     }
 
     @Test // Проверка поиска задачи по ID
-    public void shouldFindTaskById() {
+    void shouldFindTaskById() {
         assertNull(taskManager.getTaskById(task.getTaskId()), "Изначально не должно быть задач");
 
         taskManager.createNewTask(task);
@@ -57,7 +57,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка нахождения задачи в истории
-    public void shouldFindTaskInHistory() {
+    void shouldFindTaskInHistory() {
         taskManager.createNewTask(task);
         taskManager.getTaskById(task.getTaskId());
 
@@ -67,7 +67,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка поиска эпика по ID
-    public void shouldFindEpicById() {
+    void shouldFindEpicById() {
         assertNull(taskManager.getEpicById(epic.getTaskId()), "Изначально не должно быть эпиков");
 
         taskManager.createNewEpic(epic);
@@ -78,7 +78,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка нахождения эпика в истории
-    public void shouldFindEpicInHistory() {
+    void shouldFindEpicInHistory() {
         taskManager.createNewEpic(epic);
         taskManager.getEpicById(epic.getTaskId());
 
@@ -97,7 +97,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка поиска подзадачи по ID
-    public void shouldFindSubtaskById() {
+    void shouldFindSubtaskById() {
         assertNull(taskManager.getSubtaskById(subtask.getTaskId()), "Изначально не должно быть подзадач");
 
         taskManager.createNewEpic(epic);
@@ -109,7 +109,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка нахождения подзадачи в истории
-    public void shouldFindSubtaskInHistory() {
+    void shouldFindSubtaskInHistory() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
         taskManager.getSubtaskById(subtask.getTaskId());
@@ -129,12 +129,12 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка поиска по несуществующему ID
-    public void shouldReturnNullIfTaskNotFound() {
+    void shouldReturnNullIfTaskNotFound() {
         assertNull(taskManager.getTaskById(88));
     }
 
     @Test // Проверка списка задач
-    public void shouldGetTasksList() {
+    void shouldGetTasksList() {
         assertTrue(taskManager.getTasks().isEmpty(), "Список задач должен быть пуст");
 
         taskManager.createNewTask(task);
@@ -146,7 +146,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка списка эпиков
-    public void shouldGetEpicsList() {
+    void shouldGetEpicsList() {
         assertTrue(taskManager.getEpics().isEmpty(), "Список эпиков должен быть пуст");
 
         taskManager.createNewEpic(epic);
@@ -158,7 +158,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка списка подзадач
-    public void shouldGetSubtasksList() {
+    void shouldGetSubtasksList() {
         assertTrue(taskManager.getSubtasks().isEmpty(), "Список подзадач должен быть пуст");
 
         taskManager.createNewEpic(epic);
@@ -171,7 +171,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка удаления задачи по ID
-    public void shouldDeleteTaskById() {
+    void shouldDeleteTaskById() {
         taskManager.createNewTask(task);
 
         int taskId = task.getTaskId();
@@ -182,7 +182,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка удаления эпика по ID
-    public void shouldDeleteEpicById() {
+    void shouldDeleteEpicById() {
         taskManager.createNewEpic(epic);
 
         int epicId = epic.getTaskId();
@@ -193,7 +193,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка удаления подзадачи по ID
-    public void shouldDeleteSubtaskById() {
+    void shouldDeleteSubtaskById() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
 
@@ -205,21 +205,21 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка удаления всех задач
-    public void shouldDeleteAllTasks() {
+    void shouldDeleteAllTasks() {
         taskManager.createNewTask(task);
         taskManager.deleteAllTasks();
         assertTrue(taskManager.getTasks().isEmpty(), "Не все задачи удалены");
     }
 
     @Test // Проверка удаления всех эпиков
-    public void shouldDeleteAllEpics() {
+    void shouldDeleteAllEpics() {
         taskManager.createNewEpic(epic);
         taskManager.deleteAllEpics();
         assertTrue(taskManager.getEpics().isEmpty(), "Не все эпики удалены");
     }
 
     @Test // Проверка удаления всех подзадач при удалении эпика
-    public void subtasksShouldBeDeletedWithTheirEpic() {
+    void subtasksShouldBeDeletedWithTheirEpic() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
         taskManager.deleteAllEpics();
@@ -227,7 +227,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка удаления всех подзадач
-    public void shouldDeleteAllSubtasks() {
+    void shouldDeleteAllSubtasks() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
         taskManager.deleteAllSubtasks();
@@ -235,7 +235,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка обновления задачи
-    public void tasksShouldBeUpdated() {
+    void tasksShouldBeUpdated() {
         taskManager.createNewTask(task);
         int taskId = task.getTaskId();
 
@@ -255,7 +255,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка обновления эпика
-    public void epicsShouldBeUpdated() {
+    void epicsShouldBeUpdated() {
         taskManager.createNewEpic(epic);
         int epicId = epic.getTaskId();
         Epic newEpic = new Epic(epicId, "Эпик №1", "Проверка");
@@ -274,7 +274,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка обновления подзадачи
-    public void  subtasksShouldBeUpdated() {
+    void  subtasksShouldBeUpdated() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
         int subtaskId = subtask.getTaskId();
@@ -294,7 +294,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка равенства двух задач с одинаковым ID
-    public void tasksWithSameIdShouldBeEqual() {
+    void tasksWithSameIdShouldBeEqual() {
         taskManager.createNewTask(task);
         Task anotherTask = new Task(1, "Задача №2",
                                     "Описание 2", TaskStatus.IN_PROGRESS);
@@ -302,14 +302,14 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка равенства двух эпиков с одинаковым ID
-    public void epicsWithSameIdShouldBeEqual() {
+    void epicsWithSameIdShouldBeEqual() {
         taskManager.createNewEpic(epic);
         Epic anotherEpic = new Epic(1, "Эпик №2", "Описание 2");
         assertEquals(epic, anotherEpic, "Эпики с одинаковым id должны быть равны");
     }
 
     @Test // Проверка равенства двух подзадач с одинаковым ID
-    public void subtasksWithSameIdShouldBeEqual() {
+    void subtasksWithSameIdShouldBeEqual() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
         Subtask anotherSubtask = new Subtask(2, "Подзадача 2",
@@ -318,7 +318,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка невозможности сделать подзадачу своим эпиком
-    public void subtaskCantBeItsOwnEpic() {
+    void subtaskCantBeItsOwnEpic() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
 
@@ -328,7 +328,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка невозможности добавления эпика в самого себя в виде подзадачи
-    public void epicCantBeAddedIntoItself() {
+    void epicCantBeAddedIntoItself() {
         taskManager.createNewEpic(epic);
         Subtask anotherSubtask = new Subtask(epic.getTaskId(), epic.getTaskName(),
                                              epic.getTaskDescription(), epic.getTaskStatus());
@@ -338,7 +338,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка менеджера истории на возврат старой версии задачи
-    public void historyManagerShouldContainPreviousVersionsOfTasks() {
+    void historyManagerShouldContainPreviousVersionsOfTasks() {
         taskManager.createNewTask(task);
         taskManager.getTaskById(task.getTaskId());
 
@@ -356,7 +356,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка менеджера истории при изменении задачи
-    public void historyManagerShouldNotContainUpdatedTasksVersions() {
+    void historyManagerShouldNotContainUpdatedTasksVersions() {
         taskManager.createNewTask(task);
         taskManager.getTaskById(task.getTaskId());
 
@@ -372,7 +372,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка менеджера истории на возврат старой версии эпика
-    public void historyManagerShouldContainPreviousVersionsOfEpics() {
+    void historyManagerShouldContainPreviousVersionsOfEpics() {
         taskManager.createNewEpic(epic);
         taskManager.getEpicById(epic.getTaskId());
 
@@ -396,7 +396,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test  // Проверка менеджера истории при изменении эпика
-    public void historyManagerShouldNotContainUpdatedEpicVersions() {
+    void historyManagerShouldNotContainUpdatedEpicVersions() {
         taskManager.createNewEpic(epic);
         taskManager.getEpicById(epic.getTaskId());
 
@@ -419,7 +419,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка менеджера истории на возврат старой версии подзадачи
-    public void historyManagerShouldContainPreviousVersionsOfSubtasks() {
+    void historyManagerShouldContainPreviousVersionsOfSubtasks() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
         taskManager.getSubtaskById(subtask.getTaskId());
@@ -443,7 +443,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test  // Проверка менеджера истории при изменении подзадачи
-    public void historyManagerShouldNotContainUpdatedSubtasksVersions() {
+    void historyManagerShouldNotContainUpdatedSubtasksVersions() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
         taskManager.getSubtaskById(subtask.getTaskId());
@@ -474,7 +474,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка задачи на неизменность при добавлении
-    public void taskShouldRemainUnchangedAfterAdding() {
+    void taskShouldRemainUnchangedAfterAdding() {
         String taskName = task.getTaskName();
         String taskDescription = task.getTaskDescription();
         TaskStatus status = task.getTaskStatus();
@@ -488,7 +488,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка эпика на неизменность при добавлении
-    public void epicShouldRemainUnchangedAfterAdding() {
+    void epicShouldRemainUnchangedAfterAdding() {
         String epicName = epic.getTaskName();
         String epicDescription = epic.getTaskDescription();
 
@@ -502,7 +502,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка подзадачи на неизменность при добавлении
-    public void subtaskShouldRemainUnchangedAfterAdding() {
+    void subtaskShouldRemainUnchangedAfterAdding() {
         taskManager.createNewEpic(epic);
         int epicId = epic.getTaskId();
         assertTrue(epicId > 0, "Эпик должен получить свой ID");
@@ -522,7 +522,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка задач на отсутствие конфликтов при ручном и автоматическом задании ID
-    public void tasksShouldNotConflict() {
+    void tasksShouldNotConflict() {
         taskManager.createNewTask(task);
         Task newTask = new Task(20,"Задача 1", "Вручную", TaskStatus.NEW);
         taskManager.createNewTask(newTask);
@@ -536,7 +536,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка эпиков на отсутствие конфликтов при ручном и автоматическом задании ID
-    public void epicsShouldNotConflict() {
+    void epicsShouldNotConflict() {
         taskManager.createNewEpic(epic);
         Epic newEpic = new Epic(20, "Эпик 1", "Вручную");
         taskManager.createNewEpic(newEpic);
@@ -548,7 +548,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка подзадач на отсутствие конфликтов при ручном и автоматическом задании ID
-    public void subtasksShouldNotConflict() {
+    void subtasksShouldNotConflict() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
         Subtask newSubtask = new Subtask(20,"Подзадача 1",
@@ -561,7 +561,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка автоматического обновления статуса эпика
-    public void epicStatusShouldBeAutoUpdated() {
+    void epicStatusShouldBeAutoUpdated() {
         taskManager.createNewEpic(epic);
         assertEquals(TaskStatus.NEW, epic.getTaskStatus(), "Статус нового эпика не NEW");
 
@@ -572,7 +572,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка на возврат NULL при пустом списке подзадач эпика
-    public void shouldReturnNullWhenSubtasksListIsEmpty() {
+    void shouldReturnNullWhenSubtasksListIsEmpty() {
         List<Subtask> subtasks = taskManager.getSubtasks();
         assertTrue(subtasks.isEmpty());
 
@@ -580,7 +580,7 @@ public class InMemoryTaskManagerTest {
     }
 
     @Test // Проверка на возврат списка подзадач эпика
-    public void shouldReturnSubtasksList() {
+    void shouldReturnSubtasksList() {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
 

@@ -1,9 +1,10 @@
 package tasks;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
-    private ArrayList<Subtask> subtasks; // Список подзадач эпика
+    private List<Subtask> subtasks; // Список подзадач эпика
 
     public Epic(String taskName, String taskDescription) {
         super(taskName, taskDescription, TaskStatus.NEW);
@@ -15,12 +16,20 @@ public class Epic extends Task {
         this.subtasks = new ArrayList<>();
     }
 
-    public void setSubtasks(ArrayList<Subtask> subtasks) {
+    @Override
+    public Epic cloneTask() {
+        Epic epic = new Epic(getTaskId(), getTaskName(), getTaskDescription());
+        epic.setTaskStatus(this.getTaskStatus());
+        epic.setSubtasks(subtasks);
+        return epic;
+    }
+
+    public void setSubtasks(List<Subtask> subtasks) {
         this.subtasks = subtasks != null ? subtasks : new ArrayList<>();
     }
 
     // Получение списка подзадач эпика
-    public ArrayList<Subtask> getSubtasks() {
+    public List<Subtask> getSubtasks() {
         return subtasks;
     }
 
@@ -34,8 +43,8 @@ public class Epic extends Task {
     }
 
     // Получение списка идентификаторов подзадач для эпика
-    public ArrayList<Integer> getSubtasksIds() {
-        ArrayList<Integer> result = new ArrayList<>();
+    public List<Integer> getSubtasksIds() {
+        List<Integer> result = new ArrayList<>();
         for (Subtask subtask : subtasks) {
             result.add(subtask.getTaskId());
         }

@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class Task {
     private int taskIdentifier;
-    private String taskName;
-    private String taskDescription;
+    private final String taskName;
+    private final String taskDescription;
     private TaskStatus taskStatus;
 
     public Task(String taskName, String taskDescription, TaskStatus taskStatus) {
@@ -19,6 +19,10 @@ public class Task {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
+    }
+
+    public Task cloneTask() {
+        return new Task(taskIdentifier, taskName, taskDescription, taskStatus);
     }
 
     @Override

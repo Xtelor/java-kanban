@@ -50,7 +50,7 @@ public class EpicTest {
     public void getSubtasksIdsShouldReturnCorrectIds() {
         epic.addSubtask(firstSubtask);
         epic.addSubtask(secondSubtask);
-        ArrayList<Integer> list = epic.getSubtasksIds();
+        List<Integer> list = epic.getSubtasksIds();
 
         assertEquals(2, list.size(), "Должно быть 2 ID");
         assertTrue(list.contains(firstSubtask.getTaskId()) && list.contains(secondSubtask.getTaskId()), "ID подзадач должны совпадать");
@@ -58,7 +58,7 @@ public class EpicTest {
 
     @Test
     public void getSubtasksIdsShouldReturnEmptyListIfNoSubtasks() {
-        ArrayList<Integer> list = epic.getSubtasksIds();
+        List<Integer> list = epic.getSubtasksIds();
         assertTrue(list.isEmpty(), "Для эпика без подзадач должен возвращаться пустой список");
     }
 
