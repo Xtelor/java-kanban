@@ -152,7 +152,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     // Создание новой подзадачи
     @Override
-    public void createNewSubtask(Epic epic, Subtask subtask){
+    public void createNewSubtask(Epic epic, Subtask subtask) {
         if (epic.getTaskId() == subtask.getTaskId()) {
             return;
         }
