@@ -21,10 +21,6 @@ public class Task {
         this.taskStatus = taskStatus;
     }
 
-    public Task cloneTask() {
-        return new Task(taskIdentifier, taskName, taskDescription, taskStatus);
-    }
-
     @Override
     public final boolean equals(Object object) {
         if (this == object) return true;
@@ -45,7 +41,9 @@ public class Task {
 
     // Установка идентификатора задачи
     public void setTaskId(int taskIdentifier) {
-        this.taskIdentifier = taskIdentifier;
+        if (taskIdentifier > 0) {
+            this.taskIdentifier = taskIdentifier;
+        }
     }
 
     // Получение имени задачи
@@ -65,7 +63,9 @@ public class Task {
 
     // Установка статуса задачи
     public void setTaskStatus(TaskStatus taskStatus) {
-        this.taskStatus = taskStatus;
+        if (taskStatus != null) {
+            this.taskStatus = taskStatus;
+        }
     }
 
     @Override

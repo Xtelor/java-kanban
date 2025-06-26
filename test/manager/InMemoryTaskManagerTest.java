@@ -600,6 +600,203 @@ class InMemoryTaskManagerTest {
 
     }
 
+    @Test // Проверка на различие ID при создании
+    void testTaskIdsAreUnique() {
+        taskManager.createNewTask(task);
+        taskManager.createNewEpic(epic);
+        taskManager.createNewSubtask(epic, subtask);
+
+        assertNotEquals(task.getTaskId(), epic.getTaskId(), "ID задач должны быть разными");
+        assertNotEquals(task.getTaskId(), subtask.getTaskId(), "ID задач должны быть разными");
+    }
+
+    @Test // Проверка удаления задачи из истории при удалении задачи
+    void shouldRemoveTaskFromHistoryIfTaskDeleted(){
+        taskManager.createNewTask(task);
+        taskManager.getTaskById(task.getTaskId());
+
+        assertTrue(taskManager.getHistory().contains(task), "Задача должна быть в истории");
+
+        taskManager.deleteTaskById(task.getTaskId());
+
+        assertTrue(taskManager.getHistory().isEmpty(), "Задача должна быть удалена из истории");
+    }
+
+    @Test // Проверка удаления подзадачи из истории при удалении подзадачи
+    void shouldRemoveSubtaskFromHistoryIfSubtaskDeleted() {
+        taskManager.createNewEpic(epic);
+        taskManager.createNewSubtask(epic,subtask);
+        taskManager.getSubtaskById(subtask.getTaskId());
+
+        assertTrue(taskManager.getHistory().contains(subtask), "Подзадача должна быть в истории");
+
+        taskManager.deleteSubtaskById(subtask.getTaskId());
+
+        assertTrue(taskManager.getHistory().isEmpty(), "Подзадача должна быть удалена из истории");
+    }
+
+    @Test // Проверка удаления эпика из истории при удалении эпика
+    void shouldRemoveEpicFromHistoryIfEpicDeleted() {
+        taskManager.createNewEpic(epic);
+        taskManager.getEpicById(epic.getTaskId());
+
+        assertTrue(taskManager.getHistory().contains(epic), "Эпик должен быть в истории");
+
+        taskManager.deleteEpicById(epic.getTaskId());
+
+        assertTrue(taskManager.getHistory().isEmpty(), "Эпик должен быть удален из истории");
+    }
+
+    @Test // Проверка удаления подзадач из истории при удалении эпика
+    void shouldRemoveSubtasksFromHistoryIfEpicDeleted() {
+        taskManager.createNewEpic(epic);
+        Subtask subtask2 = new Subtask("Подзадача2","Описание2",TaskStatus.IN_PROGRESS);
+        taskManager.createNewSubtask(epic,subtask);
+        taskManager.createNewSubtask(epic,subtask2);
+
+        taskManager.getSubtaskById(subtask.getTaskId());
+        taskManager.getSubtaskById(subtask2.getTaskId());
+
+        assertTrue(taskManager.getHistory().contains(subtask), "Подзадача должна быть в истории");
+        assertTrue(taskManager.getHistory().contains(subtask2), "Подзадача2 должна быть в истории");
+
+        taskManager.deleteEpicById(epic.getTaskId());
+
+        assertTrue(taskManager.getHistory().isEmpty(), "Подзадачи должны быть удалены из истории");
+    }
+
+    @Test // Проверка удаления задач из истории при удалении абсолютно всех задач
+    void shouldRemoveTasksFromHistoryIfTasksDeleted() {
+        Task task2 = new Task("Задача2","Описание2",TaskStatus.DONE);
+        taskManager.createNewTask(task);
+        taskManager.createNewTask(task2);
+
+        taskManager.getTaskById(task.getTaskId());
+        taskManager.getTaskById(task2.getTaskId());
+        taskManager.deleteAllTasks();
+
+        assertTrue(taskManager.getHistory().isEmpty(), "Задачи не удалились");
+    }
+
+    @Test // Проверка удаления подзадач из истории при удалении абсолютно всех подзадач
+    void shouldRemoveSubtasksFromHistoryIfSubtasksDeleted() {
+        taskManager.createNewEpic(epic);
+        Subtask newSubtask = new Subtask("Подзадача 2", "Проверка", TaskStatus.DONE);
+        taskManager.createNewSubtask(epic,subtask);
+        taskManager.createNewSubtask(epic,newSubtask);
+
+        taskManager.getSubtaskById(subtask.getTaskId());
+        taskManager.getSubtaskById(newSubtask.getTaskId());
+        taskManager.deleteAllSubtasks();
+
+        assertTrue(taskManager.getHistory().isEmpty(), "Подзадачи должны быть удалены из истории");
+    }
+
+    @Test // Проверка удаления эпиков из истории при удалении абсолютно всех эпиков
+    void shouldRemoveEpicsFromHistoryIfEpicsDeleted() {
+        Epic epic2 = new Epic("Эпик2","Описание2");
+        taskManager.createNewEpic(epic);
+        taskManager.createNewEpic(epic2);
+
+        taskManager.getEpicById(epic.getTaskId());
+        taskManager.getSubtaskById(epic2.getTaskId());
+        taskManager.deleteAllEpics();
+
+        assertTrue(taskManager.getHistory().isEmpty(), "Эпики должны быть удалены из истории");
+    }
+
+    @Test // Проверка удаления подзадач из истории при удалении абсолютно всех эпиков
+    void shouldRemoveSubtasksFromHistoryIfEpicsDeleted() {
+        Epic epic2 = new Epic("Эпик2","Описание2");
+        taskManager.createNewEpic(epic);
+        taskManager.createNewEpic(epic2);
+
+        Subtask newSubtask = new Subtask("Подзадача 2", "Проверка", TaskStatus.DONE);
+        taskManager.createNewSubtask(epic,subtask);
+        taskManager.createNewSubtask(epic,newSubtask);
+
+        taskManager.getSubtaskById(subtask.getTaskId());
+        taskManager.getSubtaskById(newSubtask.getTaskId());
+        taskManager.getEpicById(epic2.getTaskId());
+        taskManager.deleteAllEpics();
+
+        assertTrue(taskManager.getHistory().isEmpty(), "Подзадачи должны быть удалены из истории");
+    }
+
+    @Test // Проверка удаления только задач из истории
+    void shouldRemoveOnlyTasksFromHistory() {
+        taskManager.createNewTask(task);
+        taskManager.createNewEpic(epic);
+        taskManager.createNewSubtask(epic,subtask);
+
+        taskManager.getTaskById(task.getTaskId());
+        taskManager.getEpicById(epic.getTaskId());
+        taskManager.getSubtaskById(subtask.getTaskId());
+
+        taskManager.deleteAllTasks();
+        List<Task> history = taskManager.getHistory();
+
+        assertTrue(history.contains(epic));
+        assertTrue(history.contains(subtask));
+        assertFalse(history.contains(task));
+    }
+
+    @Test // Проверка удаления только подзадач из истории
+    void shouldRemoveOnlySubtasksFromHistory() {
+        taskManager.createNewTask(task);
+        taskManager.createNewEpic(epic);
+        taskManager.createNewSubtask(epic,subtask);
+
+        taskManager.getTaskById(task.getTaskId());
+        taskManager.getEpicById(epic.getTaskId());
+        taskManager.getSubtaskById(subtask.getTaskId());
+
+        taskManager.deleteAllSubtasks();
+        List<Task> history = taskManager.getHistory();
+
+        assertTrue(history.contains(epic));
+        assertTrue(history.contains(task));
+        assertFalse(history.contains(subtask));
+    }
+
+    @Test // Проверка удаления только эпиков из истории - должны остаться только задачи
+    void shouldRemainOnlyTasksInHistory() {
+        taskManager.createNewTask(task);
+        taskManager.createNewEpic(epic);
+        taskManager.createNewSubtask(epic,subtask);
+
+        taskManager.getTaskById(task.getTaskId());
+        taskManager.getEpicById(epic.getTaskId());
+        taskManager.getSubtaskById(subtask.getTaskId());
+
+        taskManager.deleteAllEpics();
+        List<Task> history = taskManager.getHistory();
+
+        assertFalse(history.contains(epic));
+        assertTrue(history.contains(task));
+        assertFalse(history.contains(subtask));
+    }
+
+    @Test // Проверка нахождения в эпиках только актуальных ID подзадач
+    void shouldBeActualSubtaskIdsInEpic() {
+        taskManager.createNewEpic(epic);
+        Subtask newSubtask = new Subtask("Подзадача 2", "Проверка", TaskStatus.DONE);
+        taskManager.createNewSubtask(epic,subtask);
+        taskManager.createNewSubtask(epic,newSubtask);
+
+        List<Integer> subtasksIds;
+
+        subtasksIds = epic.getSubtasksIds();
+        assertTrue(subtasksIds.contains(subtask.getTaskId()), "В эпике нет ID подзадачи 1");
+        assertTrue(subtasksIds.contains(newSubtask.getTaskId()), "В эпике нет ID подзадачи 2");
+
+        taskManager.deleteSubtaskById(subtask.getTaskId());
+
+        subtasksIds = epic.getSubtasksIds();
+        assertFalse(subtasksIds.contains(subtask.getTaskId()), "В эпике осталось ID подзадачи 1");
+        assertTrue(subtasksIds.contains(newSubtask.getTaskId()), "В эпике нет ID подзадачи 2");
+    }
+
     // Проверка наличия задачи/эпика в истории
     private boolean isContainsTask(List<Task> history, int taskIdentifier,
                                    String name, String description,

@@ -7,12 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ManagersTest {
 
     @Test // Проверка утилитарного класса при возврате экземпляра менеджера
-    public void shouldNotBeNullForTaskManager() {
+    void shouldNotBeNullForTaskManager() {
         assertNotNull(Managers.getDefault());
     }
 
     @Test // Проверка утилитарного класса при возврате экземпляра менеджера истории
-    public void shouldNotBeNullForHistoryManager() {
+    void shouldNotBeNullForHistoryManager() {
         assertNotNull(Managers.getDefaultHistory());
     }
 

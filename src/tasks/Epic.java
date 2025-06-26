@@ -16,14 +16,6 @@ public class Epic extends Task {
         this.subtasks = new ArrayList<>();
     }
 
-    @Override
-    public Epic cloneTask() {
-        Epic epic = new Epic(getTaskId(), getTaskName(), getTaskDescription());
-        epic.setTaskStatus(this.getTaskStatus());
-        epic.setSubtasks(subtasks);
-        return epic;
-    }
-
     public void setSubtasks(List<Subtask> subtasks) {
         this.subtasks = subtasks != null ? subtasks : new ArrayList<>();
     }
@@ -34,12 +26,10 @@ public class Epic extends Task {
     }
 
     // Добавление подзадачи в список подзадач эпика
-    public void addSubtask(Subtask subtask){
-        if (subtask == null || subtask.getEpicIdentifier() != this.getTaskId()) {
-            return;
+    public void addSubtask(Subtask subtask) {
+        if (subtask != null && subtask.getEpicIdentifier() == this.getTaskId()) {
+            subtasks.add(subtask);
         }
-
-        subtasks.add(subtask);
     }
 
     // Получение списка идентификаторов подзадач для эпика

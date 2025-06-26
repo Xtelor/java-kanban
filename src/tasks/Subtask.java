@@ -11,13 +11,6 @@ public class Subtask extends Task {
         super(taskIdentifier, taskName, taskDescription, taskStatus);
     }
 
-    @Override
-    public Subtask cloneTask() {
-        Subtask subtask = new Subtask(getTaskId(),getTaskName(), getTaskDescription(), getTaskStatus());
-        subtask.setEpicIdentifier(epicIdentifier);
-        return subtask;
-    }
-
     // Получение идентификатора эпика для подзадачи
     public int getEpicIdentifier() {
         return epicIdentifier;
