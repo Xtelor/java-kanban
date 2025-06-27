@@ -17,23 +17,8 @@ public class InMemoryHistoryManager implements HistoryManager {
     public InMemoryHistoryManager() {
         nodes = new HashMap<>();
     }
-
-    // Добавление узла в конец списка
-    public void addLast(Task element) {
-        final Node oldTail = tail;
-        final Node newNode = new Node(tail, element, null);
-
-        tail = newNode;
-
-        if (oldTail == null) {
-            head = newNode;
-        } else {
-            oldTail.next = newNode;
-        }
-
-    }
-
     // Возвращает историю
+    @Override
     public List<Task> getHistory() {
         ArrayList<Task> tasks = new ArrayList<>();
         Node node = head;
@@ -47,6 +32,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     // Добавление задачи в историю
+    @Override
     public void addInHistory(Task task) {
         if (task == null || task.getTaskId() <= 0) return;
 
@@ -64,6 +50,21 @@ public class InMemoryHistoryManager implements HistoryManager {
             removeNode(node);
             nodes.remove(id);
         }
+    }
+
+    // Добавление узла в конец списка
+    private void addLast(Task element) {
+        final Node oldTail = tail;
+        final Node newNode = new Node(tail, element, null);
+
+        tail = newNode;
+
+        if (oldTail == null) {
+            head = newNode;
+        } else {
+            oldTail.next = newNode;
+        }
+
     }
 
     // Удаление узла связного списка
