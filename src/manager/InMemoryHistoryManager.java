@@ -17,6 +17,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     public InMemoryHistoryManager() {
         nodes = new HashMap<>();
     }
+
     // Возвращает историю
     @Override
     public List<Task> getHistory() {
