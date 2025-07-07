@@ -1,45 +1,105 @@
 package manager;
 
-import tasks.Epic;
-import tasks.Subtask;
+
 import tasks.Task;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final LinkedList<Task> taskHistory;
+    Map<Integer, Node> nodes;
+
+    // Указатель на первый элемент списка
+    private Node head;
+
+    // Указатель на последний элемент списка
+    private Node tail;
 
     public InMemoryHistoryManager() {
-        this.taskHistory = new LinkedList<>();
+        nodes = new HashMap<>();
     }
 
     // Возвращает историю
+    @Override
     public List<Task> getHistory() {
-        return new ArrayList<>(taskHistory);
+        ArrayList<Task> tasks = new ArrayList<>();
+        Node node = head;
+
+        while (node != null) {
+            tasks.add(node.data);
+            node = node.next;
+        }
+
+        return tasks;
     }
 
     // Добавление задачи в историю
-    public <T extends Task> void addInHistory(T task) {
-        if (task == null) return;
+    @Override
+    public void addInHistory(Task task) {
+        if (task == null || task.getTaskId() <= 0) return;
 
-        if (taskHistory.size() >= 10) {
-            taskHistory.removeFirst();
+        removeFromHistory(task.getTaskId());
+
+        addLast(task);
+        nodes.put(task.getTaskId(), tail);
+    }
+
+    @Override // Удаление из истории
+    public void removeFromHistory(int id) {
+        Node node = nodes.get(id);
+
+        if (node != null) {
+            removeNode(node);
+            nodes.remove(id);
         }
+    }
 
-        Task taskCopy;
-        if (task instanceof Subtask subtask) {
-            taskCopy = new Subtask(subtask.getTaskId(), subtask.getTaskName(),
-                                   subtask.getTaskDescription(), subtask.getTaskStatus());
-            ((Subtask) taskCopy).setEpicIdentifier(subtask.getEpicIdentifier());
-        } else if (task instanceof Epic epic) {
-            taskCopy = new Epic(epic.getTaskId(), epic.getTaskName(), epic.getTaskDescription());
+    // Добавление узла в конец списка
+    private void addLast(Task element) {
+        final Node oldTail = tail;
+        final Node newNode = new Node(tail, element, null);
+
+        tail = newNode;
+
+        if (oldTail == null) {
+            head = newNode;
         } else {
-            taskCopy = new Task(task.getTaskId(), task.getTaskName(),
-                                task.getTaskDescription(), task.getTaskStatus());
+            oldTail.next = newNode;
         }
 
-        taskHistory.add(taskCopy);
+    }
+
+    // Удаление узла связного списка
+    private void removeNode(Node node) {
+
+        if (node == null) {
+            return;
+        }
+
+        if (node.prev != null) {
+            node.prev.next = node.next;
+        } else {
+            head = node.next;
+        }
+
+        if (node.next != null) {
+            node.next.prev = node.prev;
+        } else {
+            tail = node.prev;
+        }
+
+        node.prev = null;
+        node.next = null;
+    }
+
+    private static class Node {
+        private Task data;
+        private Node next;
+        private Node prev;
+
+        public Node(Node prev, Task data, Node next) {
+            this.data = data;
+            this.prev = prev;
+            this.next = next;
+        }
     }
 }

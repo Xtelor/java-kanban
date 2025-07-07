@@ -8,20 +8,20 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EpicTest {
+class EpicTest {
     private Epic epic;
     private Subtask firstSubtask;
     private Subtask secondSubtask;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         epic = new Epic("Эпик","Проверка");
         firstSubtask = new Subtask("Подзадача 1", "Описание 1", TaskStatus.NEW);
         secondSubtask = new Subtask("Подзадача 2", "Описание 2", TaskStatus.IN_PROGRESS);
     }
 
     @Test
-    public void getSubtasksShouldReturnList() {
+    void getSubtasksShouldReturnList() {
         epic.addSubtask(firstSubtask);
         List<Subtask> list = epic.getSubtasks();
 
@@ -30,7 +30,7 @@ public class EpicTest {
     }
 
     @Test
-    public void setSubtaskShouldReplaceSubtask() {
+    void setSubtaskShouldReplaceSubtask() {
         ArrayList<Subtask> list = new ArrayList<>();
         list.add(firstSubtask);
         epic.setSubtasks(list);
@@ -40,25 +40,26 @@ public class EpicTest {
     }
 
     @Test
-    public void setSubtasksShouldHandleNull() {
+    void setSubtasksShouldHandleNull() {
         epic.setSubtasks(null);
         assertNotNull(epic.getSubtasks(), "При Null должен создаваться пустой список");
         assertTrue(epic.getSubtasks().isEmpty(), "Список должен быть пустым");
     }
 
     @Test
-    public void getSubtasksIdsShouldReturnCorrectIds() {
+    void getSubtasksIdsShouldReturnCorrectIds() {
         epic.addSubtask(firstSubtask);
         epic.addSubtask(secondSubtask);
-        ArrayList<Integer> list = epic.getSubtasksIds();
+        List<Integer> list = epic.getSubtasksIds();
 
         assertEquals(2, list.size(), "Должно быть 2 ID");
-        assertTrue(list.contains(firstSubtask.getTaskId()) && list.contains(secondSubtask.getTaskId()), "ID подзадач должны совпадать");
+        assertTrue(list.contains(firstSubtask.getTaskId()) && list.contains(secondSubtask.getTaskId()),
+                "ID подзадач должны совпадать");
     }
 
     @Test
-    public void getSubtasksIdsShouldReturnEmptyListIfNoSubtasks() {
-        ArrayList<Integer> list = epic.getSubtasksIds();
+    void getSubtasksIdsShouldReturnEmptyListIfNoSubtasks() {
+        List<Integer> list = epic.getSubtasksIds();
         assertTrue(list.isEmpty(), "Для эпика без подзадач должен возвращаться пустой список");
     }
 

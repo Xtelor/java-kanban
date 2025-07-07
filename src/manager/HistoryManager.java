@@ -8,5 +8,8 @@ public interface HistoryManager {
     List<Task> getHistory();
 
     // Добавление задачи в историю
-    <T extends Task> void addInHistory(T task);
+    void addInHistory(Task task);
+
+    //Удаление задачи из истории по ID
+    void removeFromHistory(int id);
 }

@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class Task {
     private int taskIdentifier;
-    private String taskName;
-    private String taskDescription;
+    private final String taskName;
+    private final String taskDescription;
     private TaskStatus taskStatus;
 
     public Task(String taskName, String taskDescription, TaskStatus taskStatus) {
@@ -41,7 +41,9 @@ public class Task {
 
     // Установка идентификатора задачи
     public void setTaskId(int taskIdentifier) {
-        this.taskIdentifier = taskIdentifier;
+        if (taskIdentifier > 0) {
+            this.taskIdentifier = taskIdentifier;
+        }
     }
 
     // Получение имени задачи
@@ -61,7 +63,9 @@ public class Task {
 
     // Установка статуса задачи
     public void setTaskStatus(TaskStatus taskStatus) {
-        this.taskStatus = taskStatus;
+        if (taskStatus != null) {
+            this.taskStatus = taskStatus;
+        }
     }
 
     @Override

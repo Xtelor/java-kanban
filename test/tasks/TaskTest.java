@@ -9,39 +9,52 @@ public class TaskTest {
     private Task task;
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         task = new Task(1,"Задача","Описание",TaskStatus.NEW);
     }
 
     @Test // Проверка получения ID задачи
-    public void shouldReturnTaskId() {
+    void shouldReturnTaskId() {
         assertEquals(1, task.getTaskId(), "ID не совпадают");
     }
 
     @Test // Проверка изменения ID задачи
-    public void shouldSetTaskId(){
+    void shouldSetTaskId(){
         task.setTaskId(4);
         assertEquals(4, task.getTaskId(), "ID не изменился");
     }
 
+    @Test // Проверка игнорирования попыток установить неверный ID задачи
+    void shouldIgnoreTasksWithInvalidId() {
+        task.setTaskId(-1);
+        task.setTaskId(0); // ID задач в программе начинаются с 1
+        assertEquals(1, task.getTaskId(), "Неверный ID установлен");
+    }
+
     @Test // Проверка получения имени
-    public void shouldReturnName() {
+    void shouldReturnName() {
         assertFalse(task.getTaskName().isEmpty(), "Имя не получено");
     }
 
     @Test // Проверка получения описания
-    public void shouldReturnDescription() {
+    void shouldReturnDescription() {
         assertFalse(task.getTaskDescription().isEmpty(), "Описание не получено");
     }
 
     @Test // Проверка получения статуса
-    public void shouldReturnStatus() {
+    void shouldReturnStatus() {
         assertNotNull(task.getTaskStatus(), "Статус не получен");
     }
 
     @Test // Проверка изменения статуса
-    public void shouldSetTaskStatus() {
+    void shouldSetTaskStatus() {
         task.setTaskStatus(TaskStatus.DONE);
         assertEquals(TaskStatus.DONE, task.getTaskStatus(), "Статус не изменился");
+    }
+
+    @Test // Статус задачи не должен быть null
+    void taskStatusShouldNotBeNull() {
+        task.setTaskStatus(null);
+        assertEquals(TaskStatus.NEW, task.getTaskStatus(), "Статус изменился на null");
     }
 }

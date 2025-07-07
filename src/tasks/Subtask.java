@@ -11,8 +11,6 @@ public class Subtask extends Task {
         super(taskIdentifier, taskName, taskDescription, taskStatus);
     }
 
-
-
     // Получение идентификатора эпика для подзадачи
     public int getEpicIdentifier() {
         return epicIdentifier;
