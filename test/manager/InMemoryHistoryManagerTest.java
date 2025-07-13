@@ -2,10 +2,7 @@ package manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import tasks.Epic;
-import tasks.Subtask;
-import tasks.Task;
-import tasks.TaskStatus;
+import tasks.*;
 
 import java.util.List;
 
@@ -18,41 +15,8 @@ class InMemoryHistoryManagerTest {
     private Epic epic;
     private Subtask subtask;
 
-    static final class TaskGenerator {
-        private int idCounter = 1;
-
-        Task createTask() {
-            Task task = new Task("Магазин", "Купить продукты", TaskStatus.NEW);
-            task.setTaskId(idCounter++);
-            return task;
-        }
-
-        Task createTask(int identifier) {
-            return new Task(identifier,"Магазин2", "Купить продукты2", TaskStatus.DONE);
-        }
-
-        Epic createEpic() {
-            Epic epic = new Epic("Переезд", "Подготовиться к переезду");
-            epic.setTaskId(idCounter++);
-            return epic;
-        }
-
-        Epic createEpic(int identifier) {
-            return new Epic(identifier,"Переезд2", "Подготовиться к переезду2");
-        }
-
-        Subtask createSubtask() {
-            Subtask subtask = new Subtask("Вещи", "Упаковать вещи", TaskStatus.NEW);
-            subtask.setTaskId(idCounter++);
-            return subtask;
-        }
-
-        Subtask createSubtask(int identifier) {
-            return new Subtask(identifier,"Вещи2", "Упаковать вещи2", TaskStatus.DONE);
-        }
-    } // Вспомогательный класс для генерации задач
-
     private TaskGenerator taskGenerator;
+
     @BeforeEach
     void beforeEach(){
         taskGenerator = new TaskGenerator();
@@ -76,7 +40,7 @@ class InMemoryHistoryManagerTest {
         List<Task> history = historyManager.getHistory();
 
         assertFalse(history.isEmpty(), "Список истории не должен быть пуст");
-        assertEquals(3,history.size(),"В истории должно быть 3 задания");
+        assertEquals(3,history.size(), "В истории должно быть 3 задания");
 
         assertTrue(isContainsTask(history, task), "История должна содержать задачу");
         assertTrue(isContainsTask(history, epic), "История должна содержать эпик");
@@ -247,7 +211,7 @@ class InMemoryHistoryManagerTest {
         Task currentSubtask = historyManager.getHistory().getFirst();
 
         assertEquals("Вещи2", currentSubtask.getTaskName(), "Имя не изменилось");
-        assertEquals("Упаковать вещи2", currentSubtask.getTaskDescription(),"Описание не изменилось");
+        assertEquals("Упаковать вещи2", currentSubtask.getTaskDescription(), "Описание не изменилось");
         assertEquals(TaskStatus.DONE, currentSubtask.getTaskStatus(), "Статус не изменился");
     }
 
@@ -375,5 +339,40 @@ class InMemoryHistoryManagerTest {
             }
         }
         return false;
+    }
+
+    // Вспомогательный класс для генерации задач
+    private static final class TaskGenerator {
+        private int idCounter = 1;
+
+        Task createTask() {
+            Task task = new Task("Магазин", "Купить продукты", TaskStatus.NEW);
+            task.setTaskId(idCounter++);
+            return task;
+        }
+
+        Task createTask(int identifier) {
+            return new Task(identifier,"Магазин2", "Купить продукты2", TaskStatus.DONE);
+        }
+
+        Epic createEpic() {
+            Epic epic = new Epic("Переезд", "Подготовиться к переезду");
+            epic.setTaskId(idCounter++);
+            return epic;
+        }
+
+        Epic createEpic(int identifier) {
+            return new Epic(identifier,"Переезд2", "Подготовиться к переезду2");
+        }
+
+        Subtask createSubtask() {
+            Subtask subtask = new Subtask("Вещи", "Упаковать вещи", TaskStatus.NEW);
+            subtask.setTaskId(idCounter++);
+            return subtask;
+        }
+
+        Subtask createSubtask(int identifier) {
+            return new Subtask(identifier,"Вещи2", "Упаковать вещи2", TaskStatus.DONE);
+        }
     }
 }
