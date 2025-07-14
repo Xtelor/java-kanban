@@ -59,7 +59,7 @@ public class CSVFormatter {
         String taskDescription = fields[4]; // Описание задачи
 
         return switch (taskType) {
-            case SUBTASK-> {
+            case SUBTASK -> {
                 Subtask subtask = new Subtask(id, taskName, taskDescription, taskStatus);
                 // ID эпика подзадачи
                 if (fields.length >= 6 && !fields[5].isBlank()) {
