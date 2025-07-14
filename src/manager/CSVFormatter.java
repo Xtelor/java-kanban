@@ -52,14 +52,13 @@ public class CSVFormatter {
             throw new IllegalArgumentException("Неверный формат строки данных");
         }
 
-
         int id = Integer.parseInt(fields[0]); // ID задачи
         TaskType taskType = TaskType.valueOf(fields[1].toUpperCase()); // Тип задачи
         String taskName = fields[2]; // Имя задачи
         TaskStatus taskStatus = TaskStatus.valueOf(fields[3].toUpperCase()); // Статус задачи
         String taskDescription = fields[4]; // Описание задачи
 
-        switch (taskType) {
+        return switch (taskType) {
             case SUBTASK-> {
                 Subtask subtask = new Subtask(id, taskName, taskDescription, taskStatus);
                 // ID эпика подзадачи
@@ -67,20 +66,17 @@ public class CSVFormatter {
                     subtask.setEpicIdentifier(Integer.parseInt(fields[5]));
                 }
 
-                return (T) subtask;
+                yield (T) subtask;
             }
             case EPIC -> {
                 Epic epic = new Epic(id, taskName, taskDescription);
                 epic.setTaskStatus(taskStatus);
-                return (T) epic;
+                yield (T) epic;
             }
             case TASK -> {
-                return (T) new Task(id, taskName, taskDescription, taskStatus);
+                yield (T) new Task(id, taskName, taskDescription, taskStatus);
             }
-            default -> {
-                throw new IllegalArgumentException("Неизвестный тип задачи: " + taskType);
-            }
-        }
+        };
     }
 
 }

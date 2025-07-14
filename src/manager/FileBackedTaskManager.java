@@ -4,9 +4,7 @@ import tasks.*;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -23,7 +21,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
-
+        int maxId = -1;
         // Наполнение данными из файла
         try {
             String resString = Files.readString(file.toPath());
@@ -41,16 +39,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             // Сначала создаем все задачи, сохраняя оригинальные ID
             for (int i = 1; i < lines.length; i++) {
                 Task task = CSVFormatter.fromString(lines[i]);
-                if (task != null) {
-                    if (task instanceof Epic epic) {
-                        epics.put(epic.getTaskId(), epic);
-                    } else if (task instanceof Subtask subtask) {
-                        subtasks.put(subtask.getTaskId(), subtask);
-                    } else {
-                        tasks.put(task.getTaskId(), task);
-                    }
-                }
+                maxId = Math.max(task.getTaskId(), maxId);
 
+                if (task instanceof Epic epic) {
+                    epics.put(epic.getTaskId(), epic);
+                } else if (task instanceof Subtask subtask) {
+                    subtasks.put(subtask.getTaskId(), subtask);
+                } else {
+                    tasks.put(task.getTaskId(), task);
+                }
             }
 
             // Второй проход: добавляем подзадачи
@@ -60,7 +57,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 epic.addSubtask(subtask);
             }
 
-            return new FileBackedTaskManager(tasks, epics, subtasks, lines.length, file);
+            return new FileBackedTaskManager(tasks, epics, subtasks, maxId + 1, file);
 
         } catch (IOException e) {
             System.out.println("Ошибка при чтении файла: " + e.getMessage());
