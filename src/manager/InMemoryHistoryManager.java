@@ -6,7 +6,7 @@ import tasks.Task;
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    Map<Integer, Node> nodes;
+    private final Map<Integer, Node> nodes;
 
     // Указатель на первый элемент списка
     private Node head;

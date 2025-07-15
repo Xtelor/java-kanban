@@ -26,6 +26,15 @@ public class InMemoryTaskManager implements TaskManager {
      *  Задачи
      */
 
+    protected InMemoryTaskManager(Map<Integer, Task> tasks, Map<Integer, Epic> epics,
+                                  Map<Integer, Subtask> subtasks, int id) {
+        this.taskMap = tasks;
+        this.epicMap = epics;
+        this.subtaskMap = subtasks;
+        this.historyManager = Managers.getDefaultHistory();
+        this.generatorId = id;
+    }
+
     // Создание новой задачи
     @Override
     public void createNewTask(Task task) {
