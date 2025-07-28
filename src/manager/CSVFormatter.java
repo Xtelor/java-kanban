@@ -2,14 +2,19 @@ package manager;
 
 import tasks.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 public class CSVFormatter {
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
     private CSVFormatter() {
 
     }
 
     public static String getHeader() {
-        return "id,type,name,status,description,epic";
+        return "id,type,name,status,description,epic,duration,startTime";
     }
 
     public static <T extends Task> String toString(T task) {
@@ -35,8 +40,14 @@ public class CSVFormatter {
         result.append(task.getTaskDescription()).append(",");
 
         if (task instanceof Subtask) {
-            result.append(((Subtask) task).getEpicIdentifier());
+            result.append(((Subtask) task).getEpicIdentifier()).append(",");
+        } else {
+            result.append("-,");
         }
+
+        result.append(task.getDuration().toMinutes()).append(",");
+
+        result.append(task.getStartTime().format(formatter));
 
         return result.toString();
     }
@@ -57,12 +68,21 @@ public class CSVFormatter {
         String taskName = fields[2]; // Имя задачи
         TaskStatus taskStatus = TaskStatus.valueOf(fields[3].toUpperCase()); // Статус задачи
         String taskDescription = fields[4]; // Описание задачи
+        long taskDuration = Integer.parseInt(fields[6]);
+
+        LocalDateTime taskStartTime;
+
+        try {
+            taskStartTime = LocalDateTime.parse(fields[7], formatter);
+        } catch (DateTimeParseException e) {
+            taskStartTime = LocalDateTime.MIN;
+        }
 
         return switch (taskType) {
             case SUBTASK -> {
-                Subtask subtask = new Subtask(id, taskName, taskDescription, taskStatus);
+                Subtask subtask = new Subtask(id, taskName, taskDescription, taskStatus, taskDuration, taskStartTime);
                 // ID эпика подзадачи
-                if (fields.length >= 6 && !fields[5].isBlank()) {
+                if (fields.length >= 8 && !fields[5].equals("-")) {
                     subtask.setEpicIdentifier(Integer.parseInt(fields[5]));
                 }
 
@@ -71,10 +91,12 @@ public class CSVFormatter {
             case EPIC -> {
                 Epic epic = new Epic(id, taskName, taskDescription);
                 epic.setTaskStatus(taskStatus);
+                epic.setDuration(taskDuration);
+                epic.setStartTime(taskStartTime);
                 yield (T) epic;
             }
             case TASK -> {
-                yield (T) new Task(id, taskName, taskDescription, taskStatus);
+                yield (T) new Task(id, taskName, taskDescription, taskStatus, taskDuration, taskStartTime);
             }
         };
     }

@@ -1,5 +1,7 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -7,18 +9,26 @@ public class Task {
     private final String taskName;
     private final String taskDescription;
     private TaskStatus taskStatus;
+    private Duration duration;
+    private LocalDateTime startTime;
 
-    public Task(String taskName, String taskDescription, TaskStatus taskStatus) {
+    public Task(String taskName, String taskDescription, TaskStatus taskStatus,
+                long duration, LocalDateTime startTime) {
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
+        this.duration = Duration.ofMinutes(duration);
+        this.startTime = startTime;
     }
 
-    public Task(int taskIdentifier, String taskName, String taskDescription, TaskStatus taskStatus) {
+    public Task(int taskIdentifier, String taskName, String taskDescription, TaskStatus taskStatus,
+                long duration, LocalDateTime startTime) {
         this.taskIdentifier = taskIdentifier;
         this.taskName = taskName;
         this.taskDescription = taskDescription;
         this.taskStatus = taskStatus;
+        this.duration = Duration.ofMinutes(duration);
+        this.startTime = startTime;
     }
 
     @Override
@@ -32,6 +42,21 @@ public class Task {
     @Override
     public final int hashCode() {
         return Objects.hashCode(taskIdentifier);
+    }
+
+    // Получение времени начала задачи
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    // Получение длительности выполнения задачи
+    public Duration getDuration() {
+        return duration;
+    }
+
+    // Получение времени окончания задачи
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
     }
 
     // Получение идентификатора задачи
@@ -63,8 +88,24 @@ public class Task {
 
     // Установка статуса задачи
     public void setTaskStatus(TaskStatus taskStatus) {
-        if (taskStatus != null) {
-            this.taskStatus = taskStatus;
+        if (taskStatus == null) {
+            throw new IllegalArgumentException("Статус задачи не может быть null.");
+        }
+        this.taskStatus = taskStatus;
+    }
+
+    // Обновление времени начала задачи
+    protected void setStartTime(LocalDateTime startTime) {
+        if (startTime == null) {
+           throw new IllegalArgumentException("Время начала задачи не может быть null.");
+        }
+        this.startTime = startTime;
+    }
+
+    // Обновление длительности задачи
+    protected void setDuration(long duration) {
+        if (duration > 0) {
+            this.duration = Duration.ofMinutes(duration);
         }
     }
 
@@ -75,6 +116,8 @@ public class Task {
                 ", taskName = '" + taskName + '\'' +
                 ", taskDescription = '" + taskDescription + '\'' +
                 ", taskStatus = " + taskStatus +
+                ", taskDuration = " + duration.toMinutes() + " min" +
+                ", taskStartTime = " + startTime +
                 '}';
     }
 }

@@ -1,14 +1,18 @@
 package tasks;
 
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
     private int epicIdentifier; // Идентификатор эпика для подзадач, входящих в него
 
-    public Subtask(String taskName, String taskDescription, TaskStatus taskStatus) {
-        super(taskName, taskDescription, taskStatus);
+    public Subtask(String taskName, String taskDescription, TaskStatus taskStatus,
+                   long duration, LocalDateTime startTime) {
+        super(taskName, taskDescription, taskStatus, duration, startTime);
     }
 
-    public Subtask(int taskIdentifier, String taskName, String taskDescription, TaskStatus taskStatus) {
-        super(taskIdentifier, taskName, taskDescription, taskStatus);
+    public Subtask(int taskIdentifier, String taskName, String taskDescription, TaskStatus taskStatus,
+                   long duration, LocalDateTime startTime) {
+        super(taskIdentifier, taskName, taskDescription, taskStatus, duration, startTime);
     }
 
     // Получение идентификатора эпика для подзадачи
@@ -32,6 +36,8 @@ public class Subtask extends Task {
                 ", taskDescription = '" + super.getTaskDescription() + '\'' +
                 ", taskStatus = " + super.getTaskStatus() +
                 ", EpicIdentifier = " + epicIdentifier +
+                ", taskDuration = " + super.getDuration().toMinutes() + " min" +
+                ", taskStartTime = " + super.getStartTime() +
                 '}';
     }
 }

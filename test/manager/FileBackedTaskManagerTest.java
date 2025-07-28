@@ -12,20 +12,16 @@ import tasks.TaskStatus;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileBackedTaskManagerTest {
-    private FileBackedTaskManager taskManager;
-    private Task task;
-    private Epic epic;
-    private Subtask subtask;
-
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private File file;
 
+    @Override
     @BeforeEach
     void beforeEach() {
         try {
@@ -33,10 +29,12 @@ public class FileBackedTaskManagerTest {
         } catch (IOException e) {
             throw new RuntimeException("Не удалось создать объекта менеджера",e);
         }
-        taskManager = new FileBackedTaskManager(file);
-        task = new Task( "Задача #1","Проверка", TaskStatus.NEW);
-        epic = new Epic( "Эпик #1","Проверка");
-        subtask = new Subtask("Подзадача #1", "Проверка", TaskStatus.IN_PROGRESS);
+        super.beforeEach();
+    }
+
+    @Override
+    protected FileBackedTaskManager createManager() {
+        return new FileBackedTaskManager(file);
     }
 
     @AfterEach
@@ -272,7 +270,8 @@ public class FileBackedTaskManagerTest {
     @Test // Проверка загрузки обновленной задачи
     void shouldLoadUpdatedTask() {
         taskManager.createNewTask(task);
-        Task task2 = new Task(task.getTaskId(), task.getTaskName(), task.getTaskDescription(), TaskStatus.DONE);
+        Task task2 = new Task(task.getTaskId(), task.getTaskName(), task.getTaskDescription(), TaskStatus.DONE,
+                task.getDuration().toMinutes(), task.getStartTime().plusHours(3));
         taskManager.updateTask(task2);
 
         // Загружаем из файла
@@ -310,7 +309,7 @@ public class FileBackedTaskManagerTest {
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
         Subtask subtask2 = new Subtask(subtask.getTaskId(), subtask.getTaskName() + "!",
-                                       subtask.getTaskDescription(), subtask.getTaskStatus());
+                                       subtask.getTaskDescription(), subtask.getTaskStatus(), task.getDuration().toMinutes(), task.getStartTime());
         taskManager.updateSubtask(subtask2);
 
         // Загружаем из файла
@@ -326,7 +325,7 @@ public class FileBackedTaskManagerTest {
     }
 
     @Test // Проверка обработки исключения в loadFromFile() при попытке прочитать нечитаемый файл
-    void loadFromFile_shouldThrowUncheckedIOException() throws IOException {
+    void loadFromFile_shouldThrowUncheckedIOException() {
         File unreadableFile = tempDir.resolve("file2.csv").toFile();
 
         assertFalse(unreadableFile.canRead(), "Файл не должен быть доступен для чтения");
@@ -343,5 +342,54 @@ public class FileBackedTaskManagerTest {
 
         assertThrows(ManagerSaveException.class,
                 () -> manager.createNewTask(task));
+    }
+
+    @Test // Проверка пустоты приоритетного списка при загрузке из пустого файла
+    void shouldObtainEmptyPrioritisedTasksList() {
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(file);
+
+        List<Task> result = loadedManager.getPrioritizedTasks();
+
+        assertTrue(result.isEmpty(), "Приоритетный список должен быть пуст");
+    }
+
+    @Test // Проверка получения приоритетного списка при загрузке из файла
+    void shouldObtainPrioritizedTasksList() {
+        taskManager.createNewTask(task);
+        taskManager.createNewEpic(epic);
+        taskManager.createNewSubtask(epic, subtask);
+
+        // Загружаем из файла
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(file);
+
+        List<Task> result = loadedManager.getPrioritizedTasks();
+
+        assertTrue(result.contains(task), "Задача не восстановлена");
+        assertTrue(result.contains(subtask), "Подзадача не восстановлена");
+
+        assertEquals(task, result.getFirst(), "Первой должна быть задача");
+        assertEquals(subtask, result.getLast(), "Последней должна быть подзадача");
+    }
+
+    @Test // Проверка получения правильного приоритетного списка при загрузке из файла
+    void shouldObtainCorrectPrioritizedTasksList() {
+        taskManager.createNewTask(task);
+        taskManager.createNewEpic(epic);
+        taskManager.createNewSubtask(epic, subtask);
+        Subtask subtask2 = new Subtask(subtask.getTaskId(), subtask.getTaskName(), subtask.getTaskDescription(),
+                subtask.getTaskStatus(), subtask.getDuration().toMinutes(), LocalDateTime.MIN);
+
+        taskManager.updateSubtask(subtask2);
+
+        // Загружаем из файла
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(file);
+
+        List<Task> result = loadedManager.getPrioritizedTasks();
+
+        assertTrue(result.contains(task), "Задача не восстановлена");
+        assertFalse(result.contains(subtask), "Подзадача восстановлена");
+
+        assertEquals(task, result.getFirst(), "Первой должна быть задача");
+        assertEquals(task, result.getLast(), "Последней должна быть задача");
     }
 }

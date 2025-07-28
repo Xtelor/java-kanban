@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestTemplate;
 import tasks.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CSVFormatterTest {
@@ -13,19 +16,26 @@ public class CSVFormatterTest {
     private Epic epic;
     private Subtask subtask;
 
+    private final LocalDateTime date = LocalDateTime.of(2025,5,12,14,54);
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
     @BeforeEach
     void beforeEach() {
-        task = new Task(1,"Task1", "Task-1-info", TaskStatus.NEW);
+        long duration = 90;
+        task = new Task(1,"Task1", "Task-1-info", TaskStatus.NEW,
+                duration, date);
         epic = new Epic(2,"Epic1", "Epic-1-info");
-        subtask = new Subtask(3,"Subtask1", "Subtask-1-info", TaskStatus.DONE);
+        subtask = new Subtask(3,"Subtask1", "Subtask-1-info", TaskStatus.DONE,
+                duration - 10, date.plusDays(1));
         subtask.setEpicIdentifier(epic.getTaskId());
         epic.setTaskStatus(subtask.getTaskStatus());
+        epic.updateDurationAndTime();
     }
 
     @Test // Проверка корректности вывода заголовка CSV-файла
     void shouldReturnHeader() {
         String result = CSVFormatter.getHeader();
-        String expected = "id,type,name,status,description,epic";
+        String expected = "id,type,name,status,description,epic,duration,startTime";
 
         assertNotNull(result, "Заголовок CSV-файла пуст");
         assertEquals(expected, CSVFormatter.getHeader(), "Неверный заголовок");
@@ -34,7 +44,7 @@ public class CSVFormatterTest {
     @Test // Проверка правильности строкового представления задачи
     void shouldReturnCorrectStringForTask() {
         String result = CSVFormatter.toString(task);
-        String expected = "1,TASK,Task1,NEW,Task-1-info,";
+        String expected = "1,TASK,Task1,NEW,Task-1-info,-,90,12.05.2025 14:54";
 
         assertEquals(expected, result, "Неверное строковое представление задачи");
     }
@@ -42,7 +52,8 @@ public class CSVFormatterTest {
     @Test // Проверка правильности строкового представления эпика
     void shouldReturnCorrectStringForEpic() {
         String result = CSVFormatter.toString(epic);
-        String expected = "2,EPIC,Epic1,DONE,Epic-1-info,";
+        String expected = "2,EPIC,Epic1,DONE,Epic-1-info,-,0,"
+                + LocalDateTime.MIN.format(formatter);
 
         assertEquals(expected, result, "Неверное строковое представление эпика");
     }
@@ -50,7 +61,7 @@ public class CSVFormatterTest {
     @Test // Проверка правильности строкового представления подзадачи
     void shouldReturnCorrectStringForSubtask() {
         String result = CSVFormatter.toString(subtask);
-        String expected = "3,SUBTASK,Subtask1,DONE,Subtask-1-info,2";
+        String expected = "3,SUBTASK,Subtask1,DONE,Subtask-1-info,2,80,13.05.2025 14:54";
 
         assertEquals(expected, result, "Неверное строковое представление подзадачи");
     }
@@ -68,7 +79,7 @@ public class CSVFormatterTest {
 
     @Test // Проверка правильности создания задачи из строки
     void shouldCreateTaskFromString() {
-        String inputString = "1,TASK,Task1,NEW,Task-1-info,";
+        String inputString = "1,TASK,Task1,NEW,Task-1-info,-,45,23.05.2025 13:47";
         Task task = CSVFormatter.fromString(inputString);
 
         assertNotNull(task, "Задача не создана");
@@ -79,11 +90,14 @@ public class CSVFormatterTest {
         assertEquals("Task1", task.getTaskName(), "Неверное название задачи");
         assertEquals(TaskStatus.NEW, task.getTaskStatus(), "Неверный статус задачи");
         assertEquals("Task-1-info", task.getTaskDescription(), "Неверное описание задачи");
+        assertEquals(45, task.getDuration().toMinutes(), "Неверная длительность задачи");
+        assertEquals(LocalDateTime.of(2025,5,23,13,47), task.getStartTime(),
+                "Неверная дата начала задачи");
     }
 
     @Test // Проверка правильности создания эпика из строки
     void shouldCreateEpicFromString() {
-        String inputString = "2,EPIC,Epic1,DONE,Epic-1-info,";
+        String inputString = "2,EPIC,Epic1,DONE,Epic-1-info,-,60,13.03.2006 08:08";
         Epic epic = CSVFormatter.fromString(inputString);
 
         assertNotNull(epic, "Эпик не создан");
@@ -92,11 +106,14 @@ public class CSVFormatterTest {
         assertEquals("Epic1", epic.getTaskName(), "Неверное название эпика");
         assertEquals(TaskStatus.DONE, epic.getTaskStatus(), "Неверный статус эпика");
         assertEquals("Epic-1-info", epic.getTaskDescription(), "Неверное описание эпика");
+        assertEquals(60, epic.getDuration().toMinutes(), "Неверная длительность эпика");
+        assertEquals(LocalDateTime.of(2006,3,13,8,8), epic.getStartTime(),
+                "Неверная дата начала эпика");
     }
 
     @Test // Проверка правильности создания подзадачи из строки
     void shouldCreateSubtaskFromString() {
-        String inputString = "3,SUBTASK,Subtask1,DONE,Subtask-1-info,2";
+        String inputString = "3,SUBTASK,Subtask1,DONE,Subtask-1-info,2,44,11.11.2011 11:11";
         Subtask subtask = CSVFormatter.fromString(inputString);
 
         assertNotNull(subtask, "Подзадача не создана");
@@ -106,6 +123,9 @@ public class CSVFormatterTest {
         assertEquals(TaskStatus.DONE, subtask.getTaskStatus(), "Неверный статус подзадачи");
         assertEquals("Subtask-1-info", subtask.getTaskDescription(), "Неверное описание подзадачи");
         assertEquals(2, subtask.getEpicIdentifier(), "Неверный id эпика проверяемой подзадачи");
+        assertEquals(44, subtask.getDuration().toMinutes(), "Неверная длительность подзадачи");
+        assertEquals(LocalDateTime.of(2011,11,11,11,11), subtask.getStartTime(),
+                "Неверная дата начала подзадачи");
     }
 
     @Test // Проверка обработки методом fromString пустой строки или null

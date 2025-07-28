@@ -4,16 +4,20 @@ import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 import tasks.TaskStatus;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
+        final LocalDateTime date = LocalDateTime.of(2025, 5, 12, 14, 54);
 
         //Создание задач
-        Task task = new Task("Магазин", "Купить продукты", TaskStatus.NEW);
-        Task anotherTask = new Task("Обучение", "Прочитать лекции", TaskStatus.NEW);
+        Task task = new Task("Магазин", "Купить продукты", TaskStatus.NEW, 12, date);
+        Task anotherTask = new Task("Обучение", "Прочитать лекции", TaskStatus.NEW,
+                43, date.plusHours(2));
         taskManager.createNewTask(task);
         taskManager.createNewTask(anotherTask);
 
@@ -24,9 +28,12 @@ public class Main {
         taskManager.createNewEpic(anotherEpic);
 
         //Создание подзадач
-        Subtask firstSubtask = new Subtask("Вещи", "Упаковать вещи", TaskStatus.NEW);
-        Subtask secondSubtask = new Subtask("Мясо", "Купить говядину", TaskStatus.NEW);
-        Subtask thirdSubtask = new Subtask("Овощи", "Купить картошку", TaskStatus.NEW);
+        Subtask firstSubtask = new Subtask("Вещи", "Упаковать вещи", TaskStatus.NEW,
+                12, date.plusDays(7));
+        Subtask secondSubtask = new Subtask("Мясо", "Купить говядину", TaskStatus.NEW,
+                12,date.minusDays(3));
+        Subtask thirdSubtask = new Subtask("Овощи", "Купить картошку", TaskStatus.NEW,
+                12, date.minusDays(2));
         taskManager.createNewSubtask(epic, firstSubtask);
         taskManager.createNewSubtask(anotherEpic, secondSubtask);
         taskManager.createNewSubtask(anotherEpic, thirdSubtask);
@@ -41,20 +48,26 @@ public class Main {
         //Получение по идентификатору
         System.out.println("Получение задачи по идентификатору: " + taskManager.getTaskById(task.getTaskId()));
         System.out.println("Получение эпика по идентификатору: " + taskManager.getEpicById(epic.getTaskId()));
-        System.out.println("Получение подзадачи по идентификатору: " + taskManager.getSubtaskById(firstSubtask.getTaskId()) + "\n");
+        System.out.println("Получение подзадачи по идентификатору: "
+                + taskManager.getSubtaskById(firstSubtask.getTaskId()) + "\n");
 
         //Обновление задач, подзадач, эпиков
-        Task updatedTask = new Task(task.getTaskId(), "Магазин", "Купить продукты на завтра", TaskStatus.DONE);
-        Task anotherUpdatedTask = new Task(anotherTask.getTaskId(), "Дистанционное обучение", "Выполнить ДЗ", TaskStatus.IN_PROGRESS);
+        Task updatedTask = new Task(task.getTaskId(), "Магазин", "Купить продукты на завтра",
+                TaskStatus.DONE, 122, date.plusDays(14));
+        Task anotherUpdatedTask = new Task(anotherTask.getTaskId(), "Дистанционное обучение",
+                "Выполнить ДЗ", TaskStatus.IN_PROGRESS, 144, date.plusDays(30));
         System.out.println("Обновлена задача: " + taskManager.updateTask(updatedTask));
         System.out.println("Обновлена задача: " + taskManager.updateTask(anotherUpdatedTask));
 
         Epic updatedEpic = new Epic(epic.getTaskId(), "Переезд", "Закончить подготовку");
         System.out.println("Обновлен эпик: " + taskManager.updateEpic(updatedEpic));
 
-        Subtask updatedFirstSubtask = new Subtask(firstSubtask.getTaskId(), "Вещи", "Упаковать вещи", TaskStatus.DONE);
-        Subtask updatedSecondSubtask = new Subtask(secondSubtask.getTaskId(), "Мясо", "Купить говядину", TaskStatus.DONE);
-        Subtask updatedThirdSubtask = new Subtask(thirdSubtask.getTaskId(), "Овощи", "Купить картошку", TaskStatus.IN_PROGRESS);
+        Subtask updatedFirstSubtask = new Subtask(firstSubtask.getTaskId(), "Вещи",
+                "Упаковать вещи", TaskStatus.DONE, 256, date.minusDays(30));
+        Subtask updatedSecondSubtask = new Subtask(secondSubtask.getTaskId(), "Мясо",
+                "Купить говядину", TaskStatus.DONE, 144, date.minusDays(14));
+        Subtask updatedThirdSubtask = new Subtask(thirdSubtask.getTaskId(), "Овощи",
+                "Купить картошку", TaskStatus.IN_PROGRESS, 14, date.plusMonths(2));
         System.out.println("Обновлена подзадача: " + taskManager.updateSubtask(updatedFirstSubtask));
         System.out.println("Обновлена подзадача: " + taskManager.updateSubtask(updatedSecondSubtask));
         System.out.println("Обновлена подзадача: " + taskManager.updateSubtask(updatedThirdSubtask) + "\n");
@@ -86,8 +99,10 @@ public class Main {
         System.out.println("\nНовый пользовательский сценарий 6-го спринта: \n");
 
         // Создание двух задач, эпика с тремя подзадачами и эпика без подзадач
-        Task task1 = new Task("Задача1","Описание1",TaskStatus.IN_PROGRESS);
-        Task task2 = new Task("Задача2","Описание2",TaskStatus.DONE);
+        Task task1 = new Task("Задача1","Описание1",TaskStatus.IN_PROGRESS,
+                14, date.minusMonths(12));
+        Task task2 = new Task("Задача2","Описание2",TaskStatus.DONE,
+                15, date.minusMonths(11));
         taskManager.createNewTask(task1);
         taskManager.createNewTask(task2);
 
@@ -96,9 +111,12 @@ public class Main {
         taskManager.createNewEpic(epic1);
         taskManager.createNewEpic(epic2);
 
-        Subtask subtask1 = new Subtask("Подзадача 1","Описание1",TaskStatus.NEW);
-        Subtask subtask2 = new Subtask("Подзадача 2","Описание2",TaskStatus.DONE);
-        Subtask subtask3 = new Subtask("Подзадача 3","Описание3",TaskStatus.IN_PROGRESS);
+        Subtask subtask1 = new Subtask("Подзадача 1","Описание1",TaskStatus.NEW,
+                111, date.minusMonths(7));
+        Subtask subtask2 = new Subtask("Подзадача 2","Описание2",TaskStatus.DONE,
+                1, date.minusMonths(8));
+        Subtask subtask3 = new Subtask("Подзадача 3","Описание3",TaskStatus.IN_PROGRESS,
+                1111, date.minusMonths(9));
         taskManager.createNewSubtask(epic1, subtask1);
         taskManager.createNewSubtask(epic1, subtask2);
         taskManager.createNewSubtask(epic1, subtask3);

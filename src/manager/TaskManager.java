@@ -5,6 +5,7 @@ import tasks.Subtask;
 import tasks.Task;
 
 import java.util.List;
+import java.util.TreeSet;
 
 public interface TaskManager {
     // Создание новой задачи
@@ -66,4 +67,7 @@ public interface TaskManager {
 
     // Возвращает историю
     List<Task> getHistory();
+
+    // Получение списка задач и подзадач по приоритету (по времени начала)
+    List<Task> getPrioritizedTasks();
 }
