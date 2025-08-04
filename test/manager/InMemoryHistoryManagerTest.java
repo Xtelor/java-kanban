@@ -4,11 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryHistoryManagerTest {
+public class InMemoryHistoryManagerTest  {
 
     private HistoryManager historyManager;
     private Task task;
@@ -88,7 +89,7 @@ class InMemoryHistoryManagerTest {
         historyManager.addInHistory(zeroEpic);
         historyManager.addInHistory(zeroSubtask);
 
-        assertTrue(historyManager.getHistory().isEmpty(), "Задачи с отрицательным ID добавились");
+        assertTrue(historyManager.getHistory().isEmpty(), "Задачи с нулевым ID добавились");
     }
 
     @Test // Проверка на множественное добавление одной и той же задачи без изменений
@@ -104,17 +105,11 @@ class InMemoryHistoryManagerTest {
 
     @Test // Проверка автоматического удаления дубликатов из истории
     void testHistoryQueue() {
-        historyManager.addInHistory(task);
-        historyManager.addInHistory(epic);
-        historyManager.addInHistory(subtask);
-
-        historyManager.addInHistory(task);
-        historyManager.addInHistory(epic);
-        historyManager.addInHistory(subtask);
-
-        historyManager.addInHistory(task);
-        historyManager.addInHistory(epic);
-        historyManager.addInHistory(subtask);
+        for (int i = 0; i < 3; i++) {
+            historyManager.addInHistory(task);
+            historyManager.addInHistory(epic);
+            historyManager.addInHistory(subtask);
+        }
 
         historyManager.addInHistory(task);
 
@@ -330,15 +325,11 @@ class InMemoryHistoryManagerTest {
 
     // Проверка наличия задачи/эпика/подзадачи в истории
     private boolean isContainsTask(List<Task> history, Task newTask) {
-        for (Task task : history) {
-            if (task.getTaskId() == newTask.getTaskId() &&
-                    task.getTaskName().equals(newTask.getTaskName()) &&
-                    task.getTaskDescription().equals(newTask.getTaskDescription()) &&
-                    task.getTaskStatus() == newTask.getTaskStatus()) {
-                return true;
-            }
-        }
-        return false;
+        return history.stream().anyMatch(task -> task.getTaskId() == newTask.getTaskId() &&
+                task.getTaskName().equals(newTask.getTaskName()) &&
+                task.getTaskDescription().equals(newTask.getTaskDescription()) &&
+                task.getTaskStatus() == newTask.getTaskStatus()
+        );
     }
 
     // Вспомогательный класс для генерации задач
@@ -346,13 +337,15 @@ class InMemoryHistoryManagerTest {
         private int idCounter = 1;
 
         Task createTask() {
-            Task task = new Task("Магазин", "Купить продукты", TaskStatus.NEW);
+            Task task = new Task("Магазин", "Купить продукты", TaskStatus.NEW,
+                    45, LocalDateTime.now());
             task.setTaskId(idCounter++);
             return task;
         }
 
         Task createTask(int identifier) {
-            return new Task(identifier,"Магазин2", "Купить продукты2", TaskStatus.DONE);
+            return new Task(identifier,"Магазин2", "Купить продукты2", TaskStatus.DONE,
+                    45, LocalDateTime.now());
         }
 
         Epic createEpic() {
@@ -362,17 +355,20 @@ class InMemoryHistoryManagerTest {
         }
 
         Epic createEpic(int identifier) {
-            return new Epic(identifier,"Переезд2", "Подготовиться к переезду2");
+            return new Epic(identifier,"Переезд2",
+                    "Подготовиться к переезду2");
         }
 
         Subtask createSubtask() {
-            Subtask subtask = new Subtask("Вещи", "Упаковать вещи", TaskStatus.NEW);
+            Subtask subtask = new Subtask("Вещи", "Упаковать вещи", TaskStatus.NEW,
+                    34, LocalDateTime.now());
             subtask.setTaskId(idCounter++);
             return subtask;
         }
 
         Subtask createSubtask(int identifier) {
-            return new Subtask(identifier,"Вещи2", "Упаковать вещи2", TaskStatus.DONE);
+            return new Subtask(identifier,"Вещи2", "Упаковать вещи2", TaskStatus.DONE,
+                    34, LocalDateTime.now());
         }
     }
 }

@@ -51,11 +51,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
 
             // Второй проход: добавляем подзадачи
-            for (Subtask subtask : subtasks.values()) {
-                int epicId = subtask.getEpicIdentifier();
-                Epic epic = epics.get(epicId);
-                epic.addSubtask(subtask);
-            }
+            subtasks.values()
+                    .forEach(subtask -> {
+                        Epic epic = epics.get(subtask.getEpicIdentifier());
+                        epic.addSubtask(subtask);
+                        epic.updateDurationAndTime();
+                    });
 
             return new FileBackedTaskManager(tasks, epics, subtasks, maxId + 1, file);
 
