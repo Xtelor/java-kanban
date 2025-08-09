@@ -1,5 +1,7 @@
 package manager;
 
+import exceptions.NotFoundException;
+import exceptions.TasksOverlapsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tasks.*;
@@ -56,7 +58,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
         // Проверка поиска задачи по ID
     void shouldFindTaskById() {
-        assertNull(taskManager.getTaskById(task.getTaskId()), "Изначально не должно быть задач");
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> taskManager.getTaskById(888),
+                "Ожидалось исключение NotFoundException"
+        );
+        assertEquals("Задача с таким ID не найдена.", exception.getMessage());
 
         taskManager.createNewTask(task);
         Task foundTask = taskManager.getTaskById(task.getTaskId());
@@ -79,7 +86,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
         // Проверка поиска эпика по ID
     void shouldFindEpicById() {
-        assertNull(taskManager.getEpicById(epic.getTaskId()), "Изначально не должно быть эпиков");
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> taskManager.getEpicById(epic.getTaskId()),
+                "Ожидалось исключение NotFoundException"
+        );
+        assertEquals("Эпик с таким ID не найден.", exception.getMessage());
 
         taskManager.createNewEpic(epic);
         Epic foundEpic = taskManager.getEpicById(epic.getTaskId());
@@ -107,7 +119,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
         // Проверка поиска подзадачи по ID
     void shouldFindSubtaskById() {
-        assertNull(taskManager.getSubtaskById(subtask.getTaskId()), "Изначально не должно быть подзадач");
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> taskManager.getSubtaskById(subtask.getTaskId()),
+                "Ожидалось исключение NotFoundException"
+        );
+        assertEquals("Подзадача с таким ID не найдена.", exception.getMessage());
 
         taskManager.createNewEpic(epic);
         taskManager.createNewSubtask(epic, subtask);
@@ -181,7 +198,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int taskId = task.getTaskId();
         taskManager.deleteTaskById(taskId);
 
-        assertNull(taskManager.getTaskById(taskId), "Задача должна быть удалена");
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> taskManager.getTaskById(taskId),
+                "Ожидалось исключение NotFoundException"
+        );
+        assertEquals("Задача с таким ID не найдена.", exception.getMessage());
         assertFalse(taskManager.getTasks().contains(task), "Задача должна быть удалена из списка");
     }
 
@@ -193,7 +215,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int epicId = epic.getTaskId();
         taskManager.deleteEpicById(epicId);
 
-        assertNull(taskManager.getEpicById(epicId), "Эпик должен быть удален");
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> taskManager.getEpicById(epicId),
+                "Ожидалось исключение NotFoundException"
+        );
+
+        assertEquals("Эпик с таким ID не найден.", exception.getMessage());
         assertFalse(taskManager.getEpics().contains(epic), "Эпик должен быть удален из списка");
     }
 
@@ -206,7 +234,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
         int subtaskId = subtask.getTaskId();
         taskManager.deleteSubtaskById(subtaskId);
 
-        assertNull(taskManager.getSubtaskById(subtaskId), "Подзадача должна быть удалена");
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> taskManager.getSubtaskById(subtaskId),
+                "Ожидалось исключение NotFoundException"
+        );
+
+        assertEquals("Подзадача с таким ID не найдена.", exception.getMessage());
         assertFalse(taskManager.getSubtasks().contains(subtask), "Подзадача должна быть удалена из списка");
     }
 
@@ -309,7 +343,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
         // Проверка поиска по несуществующему ID
     void shouldReturnNullIfTaskNotFound() {
-        assertNull(taskManager.getTaskById(88));
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> taskManager.getTaskById(888),
+                "Ожидалось исключение NotFoundException"
+        );
+        assertEquals("Задача с таким ID не найдена.", exception.getMessage());
     }
 
     @Test
@@ -561,8 +600,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createNewTask(task);
         Task newTask = new Task("Задача #1", "Проверка", TaskStatus.NEW,
                 duration, date.plusHours(1));
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
+        TasksOverlapsException exception = assertThrows(
+                TasksOverlapsException.class,
                 () -> taskManager.createNewTask(newTask),
                 "Метод должен выбрасывать IllegalStateException при пересечении задач по времени"
 
@@ -580,8 +619,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Subtask newSubtask = new Subtask("Подзадача #1", "Проверка", TaskStatus.IN_PROGRESS,
                 duration, date.plusHours(5));
 
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
+        TasksOverlapsException exception = assertThrows(
+                TasksOverlapsException.class,
                 () -> taskManager.createNewSubtask(epic, newSubtask),
                 "Метод должен выбрасывать IllegalStateException при пересечении подзадач по времени"
 
@@ -591,19 +630,23 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-        // Проверка выбрасывания исключения при пересечении обновленной задачи по времени
+        // Проверка выбрасывания исключения при пересечении обновленной задачи по времени с другой
     void shouldHandleConflictsDuringTaskUpdate() {
         Task task = new Task("Задача1", "Описание1", TaskStatus.NEW,
                 60, LocalDateTime.of(2023, 1, 1, 10, 0));
         taskManager.createNewTask(task);
 
-        Task newTask = new Task(task.getTaskId(), "Задача1", "Описание2", TaskStatus.DONE,
-                60, LocalDateTime.of(2023, 1, 1, 10, 30));
+        Task newTask = new Task(task.getTaskId(), "Задача1", "Описание2",
+                TaskStatus.DONE, 60, LocalDateTime.of(2023, 1, 1, 10, 30));
 
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
+        Task anotherTask = new Task( "Задача1", "Описание2",
+                TaskStatus.DONE, 60, LocalDateTime.of(2023, 1, 1, 11, 25));
+        taskManager.createNewTask(anotherTask);
+
+        TasksOverlapsException exception = assertThrows(
+                TasksOverlapsException.class,
                 () -> taskManager.updateTask(newTask),
-                "Метод должен выбрасывать IllegalStateException в случае пересечения " +
+                "Метод должен выбрасывать TasksOverlapsException в случае пересечения " +
                         "обновленной задачи с уже существующей"
         );
 
@@ -611,7 +654,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-        // Проверка выбрасывания исключения при пересечении обновленной подзадачи по времени
+        // Проверка выбрасывания исключения при пересечении обновленной подзадачи по времени с другой
     void shouldHandleConflictsDuringSubtaskUpdate() {
         taskManager.createNewEpic(epic);
         Subtask subtask = new Subtask("Задача1", "Описание1", TaskStatus.NEW,
@@ -621,8 +664,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Subtask newSubtask = new Subtask(subtask.getTaskId(), "Задача1", "Описание2",
                 TaskStatus.DONE, 60, LocalDateTime.of(2023, 1, 1, 10, 30));
 
-        IllegalStateException exception = assertThrows(
-                IllegalStateException.class,
+        Subtask anotherSubtask = new Subtask( "Задача1", "Описание2",
+                TaskStatus.DONE, 60, LocalDateTime.of(2023, 1, 1, 11, 25));
+        taskManager.createNewSubtask(epic, anotherSubtask);
+
+        TasksOverlapsException exception = assertThrows(
+                TasksOverlapsException.class,
                 () -> taskManager.updateSubtask(newSubtask),
                 "Метод должен выбрасывать IllegalStateException в случае пересечения " +
                         "обновленной подзадачи с уже существующей"
