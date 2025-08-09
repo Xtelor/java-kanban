@@ -82,7 +82,7 @@ public class CSVFormatter {
             case SUBTASK -> {
                 Subtask subtask = new Subtask(id, taskName, taskDescription, taskStatus, taskDuration, taskStartTime);
                 // ID эпика подзадачи
-                if (fields.length >= 8 && !fields[5].equals("-")) {
+                if (!fields[5].equals("-")) {
                     subtask.setEpicIdentifier(Integer.parseInt(fields[5]));
                 }
 

@@ -386,7 +386,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         taskManager.createNewEpic(epic2);
 
         taskManager.getEpicById(epic.getTaskId());
-        taskManager.getSubtaskById(epic2.getTaskId());
+        taskManager.getEpicById(epic2.getTaskId());
         taskManager.deleteAllEpics();
 
         assertTrue(taskManager.getHistory().isEmpty(), "Эпики должны быть удалены из истории");
